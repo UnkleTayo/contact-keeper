@@ -67,11 +67,19 @@ const ContactState = (props) => {
   };
 
   // Delete contacts
-  const deleteContact = (id) => {
-    dispatch({
-      type: DELETE_CONTACT,
-      payload: id,
-    });
+  const deleteContact = async (id) => {
+    try {
+      const res = await axios.delete(`/api/contacts/${id}`);
+      dispatch({
+        type: DELETE_CONTACT,
+        payload: id,
+      });
+    } catch (err) {
+      dispatch({
+        type: CONTACT_ERROR,
+        payload: err.response.msg,
+      });
+    }
   };
 
   // clear Contacts
@@ -95,10 +103,24 @@ const ContactState = (props) => {
   };
   // UPDATE Contact
   const updateContact = (contact) => {
-    dispatch({
-      type: UPDATE_CONTACT,
-      payload: contact,
-    });
+    // contact.id = uuidv4();
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    try {
+      const res = await axios.post(`/api/contacts/${contact._id}`, contact, config);
+      dispatch({
+        type: UPDATE_CONTACT,
+        payload: res.data,
+      });
+    } catch (err) {
+      dispatch({
+        type: CONTACT_ERROR,
+        payload: err.response.msg,
+      }
   };
   // Filter contacts
   const filterContacts = (text) => {
